@@ -234,7 +234,7 @@ No host (Ubuntu/Debian-like):
 - Python 3.x (para Ansible)
 - Acesso à internet (para baixar dependências, docker images, etc.)
 
-Tudo o resto o Ansible cuida:
+Tudo o resto o **Ansible** cuida:
 
 - Go
 - PostgreSQL (servidor, DB, usuário, tabelas)
