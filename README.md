@@ -1,4 +1,5 @@
-# nfe-drop
+# NFE-DROP
+<img src="quantum.png" alt="Golang" width="200" />
 
 Pipeline de processamento de NF-e em **Go**, com:
 
