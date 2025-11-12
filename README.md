@@ -20,6 +20,11 @@
 
 <img src="nfe-drop.png" alt="Golang" width="200" />
 
+## Resumo para que esse projeto foi criado:
+- Consumir grandes volumes de arquivos
+- Monitora pastas (incoming/, processing/, ZIP e XML) usando watcher em **Go**.
+- Consegue receber lotes gigantes de arquivos e ir empilhando na fila e processando tudo muito rapido.
+
 ### Fluxo de alto nível
 
 ```mermaid
@@ -51,7 +56,7 @@ Pipeline de processamento de NF-e em **Go**, com:
 - integração preparada para **Graylog** e **Wazuh**
 - provisionamento completo via **Ansible**
 
-Focado em **alto throughput**, robustez e observabilidade. A ideia é aguentar muita NF-e caindo na pasta e simplesmente sumir na velocidade da luz para o banco.
+Focado em **alto throughput**, robustez e observabilidade. O sistema esta preparado para consumir grandes volumes de NFE.
 
 ---
 
@@ -62,13 +67,13 @@ Componentes:
 - **Watcher**  
   Serviço systemd em Go que monitora a pasta `incoming/` via fsnotify/inotify:
   - move arquivos válidos para `processing/`
-  - descarta lixo (ex.: `Zone.Identifier`) em `ignored/`
+  - descarta qualquer arquivo que nao seja .zip/.xml e lixo (ex.: `Zone.Identifier`) em `ignored/`
   - publica jobs em **RabbitMQ** (tipo `xml` ou `zip`)
 
 - **Worker**  
   Serviço systemd em Go que:
   - consome jobs do RabbitMQ (`nfe-drop-jobs`)
-  - valida XML com XSD da Sefaz
+  - valida XML com XSD da **Sefaz**
   - faz parse completo dos campos relevantes (cabeçalho, itens, duplicatas, pagamentos)
   - persiste no **PostgreSQL**
   - move o arquivo para `processed/` ou `failed/`
@@ -89,7 +94,7 @@ Componentes:
 
 ## 2. Tecnologias Principais
 
-- **Linguagem:** Go
+- **Linguagem: Go**
 - **Watcher / Worker:**
   - `github.com/fsnotify/fsnotify` – inotify para monitorar diretórios
   - `github.com/lestrrat-go/libxml2` + `github.com/terminalstatic/go-xsd-validate` – validação XSD
@@ -114,7 +119,7 @@ Componentes:
 
 ## 3. Modelo de Dados (PostgreSQL)
 
-### Tabelas principais
+### Tabelas principais otimizadas
 
 - `nfe` – cabeçalho da NF-e
 - `nfe_xml` – XML bruto + representação JSON
@@ -303,7 +308,7 @@ Dentro de `/opt/nfe-drop-services`:
 - `processing/` – arquivos em processamento
 - `processed/` – arquivos já processados com sucesso
 - `failed/` – arquivos que falharam (XML inválido, duplicidade, erro de DB, etc.)
-- `ignored/` – arquivos lixo (Zone.Identifier e afins)
+- `ignored/` – arquivos que nao sao xml e **Zone.Identifier** é sempre apagado, problema comum em **WSL** 
 - `tmp/` – temporários (ex.: extração de ZIP)
 - `deploy/` – docker-compose de Rabbit, Grafana, Prometheus, Graylog, Wazuh, etc.
 
@@ -365,7 +370,7 @@ Portas de métricas (Prometheus scrape):
 
 1. **Upload / Drop de arquivos**
    - Você copia arquivos `.xml` ou `.zip` para `incoming/`
-   - Qualquer lixo (ex.: `*.Zone.Identifier`) é detectado e movido para `ignored/`
+   - Qualquer lixo é detectado e movido para `ignored/`
 
 2. **Watcher**
    - Vê o arquivo novo via inotify
@@ -545,7 +550,6 @@ ansible-playbook -i inventory.ini site.yml -K
 - UI para monitoramento da fila e reprocessamento manual
 - Feature flags para:
   - modo somente-validação (sem persistir)
-  - modo somente-persistência (sem XSD – não recomendamos, mas às vezes o mundo é zoado)
 - Exportação de métricas específicas por:
   - CNPJ emitente
   - código de status da Sefaz
@@ -567,6 +571,6 @@ ansible-playbook -i inventory.ini site.yml -K
   - **Graylog** (logs estruturados)
   - **Wazuh** (segurança e SIEM)
 - Provisionamento automatizado:  
-  `ansible-playbook -i inventory.ini site.yml -K` e o stack nasce.
+  `ansible-playbook -i inventory.ini site.yml -K`
 
 ---
