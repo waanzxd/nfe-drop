@@ -26,7 +26,8 @@
 - O **nfe-drop** é um motor de ingestão de NF-e, preparado para grandes volumes, que valida, parseia, enfileira, processa e persiste cada nota com logs estruturados e métricas exportadas, pronto para rodar em produção com monitoramento completo
 - Monitora pastas (incoming/, processing/, ZIP e XML) usando watcher em **Go**.
 - Consegue receber lotes gigantes de arquivos e ir empilhando na fila e processando tudo muito rapido.
-
+- O worker de NF-e é idempotente: a mesma NF-e pode ser enviada múltiplas vezes (por falha, retry ou reenvio), e o sistema garantirá que apenas um registro consistente será persistido no banco.
+  
 ### Fluxo de alto nível
 
 ```mermaid
