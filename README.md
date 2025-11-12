@@ -27,17 +27,14 @@ flowchart LR
   end
 
   C -->|job JSON| Q[RabbitMQ nfe-drop-jobs]
-  Q --> W[Worker pool (Go)]
-  W --> DB[(PostgreSQL)]
-  W --> L[Logs estruturados (Graylog / Wazuh)]
+  Q --> WK[nfe-drop-worker (pool de workers)]
 
-    W -->|job (JSON)| Q["RabbitMQ\nqueue: nfe-drop-jobs"]
+  WK -->|parse XML + valida XSD| P[(PostgreSQL: nfe, itens, duplicatas, pagamentos, xml)]
+  WK -->|logs JSON| L[Graylog / Filebeat]
+  WK -->|métricas| M[Prometheus → Grafana]
 
-    Q -->|consume| WK["nfe-drop-worker\n(pool de workers)"]
-    WK -->|parse XML + valida XSD| P[(PostgreSQL\nnfe / nfe_item / nfe_duplicatas / nfe_pagamentos / nfe_xml)]
-    WK -->|logs JSON| L[Graylog / Filebeat]
-    WK -->|métricas| M[Prometheus → Grafana]
-    FS -->|logs de host / agentes| Z[Wazuh]
+  H[Hosts / agentes] --> Z[Wazuh]
+  Z --> L
 ```
 
 Componentes:
