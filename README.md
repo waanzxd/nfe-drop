@@ -3,7 +3,19 @@
 
 [![Go](https://img.shields.io/badge/Go-1.23+-00ADD8?logo=go&logoColor=white)]()
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-4169E1?logo=postgresql&logoColor=white)]()
-...
+[![Docker](https://img.shields.io/badge/Docker-Container-2496ED?logo=docker&logoColor=white)]()
+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-Orquestração-2496ED?logo=docker&logoColor=white)]()
+[![Ansible](https://img.shields.io/badge/Ansible-Automação-EE0000?logo=ansible&logoColor=white)]()
+[![Linux](https://img.shields.io/badge/Linux-Host-FCC624?logo=linux&logoColor=black)]()
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-DB-4169E1?logo=postgresql&logoColor=white)]()
+[![Redis](https://img.shields.io/badge/Redis-Cache-DC382D?logo=redis&logoColor=white)]()
+[![RabbitMQ](https://img.shields.io/badge/RabbitMQ-Fila-FF6600?logo=rabbitmq&logoColor=white)]()
+[![Prometheus](https://img.shields.io/badge/Prometheus-Métricas-E6522C?logo=prometheus&logoColor=white)]()
+[![Grafana](https://img.shields.io/badge/Grafana-Dashboards-F46800?logo=grafana&logoColor=white)]()
+[![Graylog](https://img.shields.io/badge/Graylog-Logs-FF3633?logo=graylog&logoColor=white)]()
+[![Wazuh](https://img.shields.io/badge/Wazuh-SIEM-025E8C?logo=wazuh&logoColor=white)]()
+[![Git](https://img.shields.io/badge/Git-Controle_de_Versão-F05032?logo=git&logoColor=white)]()
+[![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github&logoColor=white)]()
 
 
 <img src="nfe-drop.png" alt="Golang" width="200" />
