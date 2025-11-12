@@ -59,7 +59,7 @@ Pipeline de processamento de NF-e em **Go**, com:
 - integração preparada para **Graylog** e **Wazuh**
 - provisionamento completo via **Ansible**
 
-Focado em **alto throughput**, robustez e observabilidade. O sistema esta preparado para consumir grandes volumes de NFE.
+Focado em **alto throughput**, robustez e observabilidade. O sistema esta preparado para consumir grandes volumes de dados.
 
 ---
 
