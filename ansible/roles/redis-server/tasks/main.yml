@@ -1,0 +1,15 @@
+---
+# Role: redis-server
+# Instala Redis nativo e garante serviço rodando
+
+- name: Instala Redis
+  apt:
+    name: redis-server
+    state: present
+    update_cache: true
+
+- name: Garante que serviço redis-server está habilitado e rodando
+  systemd:
+    name: redis-server
+    enabled: true
+    state: started

@@ -1,0 +1,31 @@
+# Binários e build
+bin/
+tmp/
+*.out
+
+# Go
+*.exe
+*.test
+*.log
+
+# Dependências baixadas
+vendor/
+
+# Configs locais / segredos
+.env
+*.env
+/etc/filebeat/filebeat.yml
+/etc/nfe-drop.env
+
+# Arquivos de editor/IDE
+.vscode/
+.idea/
+*.swp
+
+# Docker lixo local
+**/.DS_Store
+**/node_modules/
+
+# Por segurança, qualquer XML/ZIP solto
+*.xml
+*.zip

@@ -1,0 +1,16 @@
+[Unit]
+Description=NFE Drop - Worker (processador de XML/ZIP)
+After=network.target nfe-drop-watcher.service
+
+[Service]
+User={{ login_user }}
+Group={{ login_user }}
+
+WorkingDirectory={{ app_source_dir }}
+ExecStart={{ app_source_dir }}/bin/nfe-drop-worker
+
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

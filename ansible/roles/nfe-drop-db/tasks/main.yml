@@ -1,0 +1,26 @@
+---
+# Role: nfe-drop-db
+# - Instala PostgreSQL via apt
+# - Garante serviço rodando
+# - Chama migrator Go em modo --auto
+#   (cria DB se não existir, aplica migrations, não dropa DB existente)
+
+- name: Instala PostgreSQL
+  apt:
+    name:
+      - postgresql
+      - postgresql-contrib
+    state: present
+    update_cache: true
+
+- name: Garante que serviço postgresql está habilitado e rodando
+  systemd:
+    name: postgresql
+    enabled: true
+    state: started
+
+- name: Roda migrator do nfe-drop em modo automático (--auto)
+  command: go run ./cmd/nfe-drop-migrator --auto
+  args:
+    chdir: "{{ app_source_dir }}"
+  become: false    

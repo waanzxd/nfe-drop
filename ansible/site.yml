@@ -1,0 +1,47 @@
+---
+- hosts: local
+  become: true
+
+  vars:
+    login_user: "{{ ansible_env.SUDO_USER | default(ansible_user_id) }}"
+    app_source_dir: "/home/{{ login_user }}/golang/nfe-drop"
+    services_deploy_dir: "/opt/nfe-drop-services" 
+    nfe_drop_db_name: "nfe_drop"
+    
+    # 🔧 NOVAS VARIÁVEIS PARA CORRIGIR PERMISSÕES
+    wazuh_version: "4.8.0"
+    wazuh_uid: "1000"  # Altere para o UID do seu usuário se necessário
+    wazuh_gid: "1000"  # Altere para o GID do seu usuário se necessário
+
+  pre_tasks:
+    - name: Garante que o diretório base da aplicação existe
+      file:
+        path: "{{ services_deploy_dir }}"
+        state: directory
+        mode: "0755"
+        owner: "{{ login_user }}"
+        group: "{{ login_user }}"
+
+    - name: Obtém UID e GID do usuário
+      shell: |
+        id -u {{ login_user }}
+        id -g {{ login_user }}
+      register: user_ids
+      changed_when: false
+
+    - name: Define UID e GID dinamicamente
+      set_fact:
+        wazuh_uid: "{{ user_ids.stdout_lines[0] }}"
+        wazuh_gid: "{{ user_ids.stdout_lines[1] }}"
+
+  roles:
+    - go
+    - nfe-drop-db
+    - postgres-backup
+    - docker-engine
+    - redis-server
+    - nfe-drop-rabbitmq-docker
+    - nfe-drop-app
+    - nfe-drop-observability
+    - nfe-drop-graylog
+    - nfe-drop-wazuh

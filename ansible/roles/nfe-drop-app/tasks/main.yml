@@ -1,0 +1,75 @@
+---
+# Role: nfe-drop-app
+# Responsável por:
+# - garantir diretórios de trabalho (incoming, processing, etc)
+# - buildar binários (go build)
+# - instalar units systemd do watcher/worker
+# - garantir serviços habilitados e rodando
+
+- name: Garante que o diretório do projeto existe
+  file:
+    path: "{{ services_deploy_dir }}"
+    state: directory
+  # Em um cenário mais avançado, aqui poderíamos fazer git clone se o diretório não existisse.
+
+- name: Garante diretórios de trabalho do nfe-drop
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: "0755"
+  loop:
+    - "{{ services_deploy_dir }}/incoming"
+    - "{{ services_deploy_dir }}/processing"
+    - "{{ services_deploy_dir }}/processed"
+    - "{{ services_deploy_dir }}/failed"
+    - "{{ services_deploy_dir }}/ignored"
+    - "{{ services_deploy_dir }}/tmp"
+
+- name: Garante diretório bin para os executáveis
+  file:
+    path: "{{ services_deploy_dir }}/bin"
+    state: directory
+    mode: "0755"
+
+- name: Build do nfe-drop-watcher (go build)
+  command: go build -o bin/nfe-drop-watcher ./cmd/nfe-drop-watcher
+  args:
+    chdir: "{{ app_source_dir }}"
+
+- name: Build do nfe-drop-worker (go build)
+  command: go build -o bin/nfe-drop-worker ./cmd/nfe-drop-worker
+  args:
+    chdir: "{{ app_source_dir }}"
+
+- name: Instala unit systemd do watcher (via template)
+  template:
+    src: "{{ app_source_dir }}/deploy/systemd/nfe-drop-watcher.service.j2"
+    dest: "/etc/systemd/system/nfe-drop-watcher.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - daemon-reload
+
+- name: Instala unit systemd do worker
+  template:
+    src: "{{ app_source_dir }}/deploy/systemd/nfe-drop-worker.service.j2"
+    dest: "/etc/systemd/system/nfe-drop-worker.service"
+    owner: root
+    group: root
+    mode: "0644"
+  notify:
+    - daemon-reload
+
+- name: Garante que o serviço nfe-drop-watcher está habilitado e rodando
+  systemd:
+    name: nfe-drop-watcher
+    enabled: true
+    state: started
+
+- name: Garante que o serviço nfe-drop-worker está habilitado e rodando
+  systemd:
+    name: nfe-drop-worker
+    enabled: true
+    state: started
+

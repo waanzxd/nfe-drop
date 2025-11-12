@@ -1,0 +1,36 @@
+version: "3.9"
+
+services:
+  mongo:
+    image: mongo:6
+    container_name: nfe-mongo
+    restart: unless-stopped
+
+  opensearch:
+    image: opensearchproject/opensearch:2.11.0
+    container_name: nfe-opensearch
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+    restart: unless-stopped
+
+  graylog:
+    image: graylog/graylog:5.2
+    container_name: nfe-graylog
+    depends_on:
+      - mongo
+      - opensearch
+    environment:
+      - GRAYLOG_PASSWORD_SECRET=3b707d9db7aa8251ce248e0a21d7db4ebaf49b8c2ac2a992aad57bc832267856
+      - GRAYLOG_ROOT_PASSWORD_SHA2=240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9
+      # SHA-256 de "admin"
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
+    ports:
+      - "9000:9000"   # web
+      - "5044:5044"   # Beats / Filebeat
+    restart: unless-stopped

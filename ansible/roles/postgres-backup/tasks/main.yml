@@ -1,0 +1,40 @@
+---
+- name: Garante diretório de backup do Postgres
+  file:
+    path: /var/backups/nfe-drop
+    state: directory
+    owner: postgres
+    group: postgres
+    mode: "0750"
+
+- name: Instala script de backup do Postgres
+  copy:
+    dest: /usr/local/bin/nfe-drop-pg-backup.sh
+    owner: postgres
+    group: postgres
+    mode: "0750"
+    content: |
+      #!/usr/bin/env bash
+      set -e
+
+      BACKUP_DIR="/var/backups/nfe-drop"
+      DB_NAME="{{ nfe_drop_db_name }}"
+      DATE="$(date +%Y%m%d-%H%M%S)"
+
+      mkdir -p "${BACKUP_DIR}"
+
+      # Dump em formato custom (-Fc) para facilitar restore com pg_restore
+      pg_dump -Fc "${DB_NAME}" > "${BACKUP_DIR}/${DB_NAME}_${DATE}.dump"
+
+      # Mantém só 90 dias de backup
+      find "${BACKUP_DIR}" -type f -name "${DB_NAME}_*.dump" -mtime +90 -delete
+
+- name: Agenda backup diario do Postgres as 03:00
+  cron:
+    name: "NFE Drop monthly PostgreSQL backup"
+    user: postgres
+    minute: "0"
+    hour: "3"
+    day: "*"
+    month: "*"
+    job: "/usr/local/bin/nfe-drop-pg-backup.sh >/var/log/nfe-drop-pg-backup.log 2>&1"

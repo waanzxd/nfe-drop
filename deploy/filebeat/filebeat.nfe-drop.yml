@@ -1,0 +1,11 @@
+filebeat.inputs:
+  - type: journald
+    id: nfe-drop-journald
+    include_matches:
+      - "nfe-drop-worker"
+      - "nfe-drop-watcher"
+
+filebeat.modules: []
+
+output.logstash:
+  hosts: ["localhost:5044"]

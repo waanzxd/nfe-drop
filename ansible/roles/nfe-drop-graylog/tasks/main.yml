@@ -1,0 +1,19 @@
+---
+# Role: nfe-drop-graylog
+# Sobe Graylog stack (mongo + opensearch + graylog) via docker compose
+
+- name: Verifica se docker-compose.graylog.yml existe
+  stat:
+    path: "{{ app_source_dir }}/deploy/docker-compose.graylog.yml"
+  register: graylog_compose
+
+- name: Falha se docker-compose.graylog.yml não existir
+  fail:
+    msg: "Arquivo {{ app_source_dir }}/deploy/docker-compose.graylog.yml não encontrado. Crie o compose do Graylog em deploy/."
+  when: not graylog_compose.stat.exists
+
+- name: Sobe Graylog stack via docker compose
+  command: >
+    docker compose -f docker-compose.graylog.yml up -d
+  args:
+    chdir: "{{ app_source_dir }}/deploy"

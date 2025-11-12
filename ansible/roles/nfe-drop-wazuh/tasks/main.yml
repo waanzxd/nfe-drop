@@ -1,0 +1,124 @@
+---
+# Role: nfe-drop-wazuh
+# Instala Wazuh single-node v4.8.0 via docker-compose oficial
+
+- name: Instala dependência git
+  become: true
+  apt:
+    name: git
+    state: present
+    update_cache: true
+
+- name: Garante diretório base de deploy do Wazuh
+  become: true
+  file:
+    path: "{{ services_deploy_dir }}/deploy"
+    state: directory
+    owner: "{{ login_user }}"
+    group: "{{ login_user }}"
+    mode: "0755"
+
+- name: Clona ou atualiza repositório wazuh-docker (tag estável v4.8.0)
+  become: false
+  git:
+    repo: "https://github.com/wazuh/wazuh-docker.git"
+    dest: "{{ services_deploy_dir }}/deploy/wazuh-docker"
+    version: "v4.8.0"
+    update: yes
+    force: yes
+  environment:
+    GIT_TERMINAL_PROMPT: "0"
+
+# 🔧 Em vez de mexer no docker-compose.yml original,
+# criamos um docker-compose.override.yml para mudar a porta do dashboard.
+- name: Cria docker-compose.override.yml para expor dashboard na porta 5601
+  become: true
+  copy:
+    dest: "{{ services_deploy_dir }}/deploy/wazuh-docker/single-node/docker-compose.override.yml"
+    mode: "0644"
+    content: |
+      services:
+        wazuh.dashboard:
+          ports:
+            - "5601:5601"
+
+- name: Ajusta vm.max_map_count para Wazuh Indexer/OpenSearch
+  become: true
+  sysctl:
+    name: vm.max_map_count
+    value: "262144"
+    state: present
+    reload: yes
+
+- name: Verifica se certificados do indexer já existem
+  become: true
+  stat:
+    path: "{{ services_deploy_dir }}/deploy/wazuh-docker/single-node/config/wazuh_indexer_ssl_certs/root-ca.pem"
+  register: wazuh_certs
+
+- name: Gera certificados (generate-indexer-certs.yml) se ainda não existem
+  become: true
+  command: docker compose -f generate-indexer-certs.yml run --rm generator
+  args:
+    chdir: "{{ services_deploy_dir }}/deploy/wazuh-docker/single-node"
+  when: not wazuh_certs.stat.exists
+  register: wazuh_generate_certs
+
+- name: Log da geração de certificados (se executou)
+  debug:
+    var: wazuh_generate_certs.stdout_lines
+  when: wazuh_generate_certs is defined
+
+- name: Sobe stack Wazuh single-node (docker compose up -d)
+  become: true
+  command: docker compose up -d
+  args:
+    chdir: "{{ services_deploy_dir }}/deploy/wazuh-docker/single-node"
+  register: wazuh_up
+
+- name: Mostra saída do docker compose up
+  debug:
+    var: wazuh_up.stdout_lines
+
+- name: Aguarda containers inicializarem (até 120s)
+  wait_for:
+    timeout: 120
+  delegate_to: localhost
+
+- name: Verifica status dos containers Wazuh
+  become: true
+  command: docker compose ps
+  args:
+    chdir: "{{ services_deploy_dir }}/deploy/wazuh-docker/single-node"
+  register: wazuh_ps
+
+- name: Mostra status dos containers Wazuh
+  debug:
+    var: wazuh_ps.stdout_lines
+
+- name: Conta quantos serviços estão em estado 'running'
+  become: true
+  shell: |
+    cd {{ services_deploy_dir }}/deploy/wazuh-docker/single-node
+    docker compose ps --services --filter "status=running" | wc -l
+  register: wazuh_running
+  changed_when: false
+
+- name: Exibe informações de acesso ao Wazuh
+  debug:
+    msg:
+      - "=========================================="
+      - "✓ Wazuh (single-node) via Docker Compose"
+      - "=========================================="
+      - "Containers rodando: {{ wazuh_running.stdout | default('0') }}/3"
+      - ""
+      - "{{ 'Dashboard: https://localhost:5601' if (wazuh_running.stdout | int) >= 3 else 'ATENÇÃO: Verifique logs do indexer/dashboard – nem todos os serviços estão rodando.' }}"
+      - "Usuário padrão: admin"
+      - "Senha padrão: SecretPassword"
+      - ""
+      - "Comandos úteis:"
+      - "  cd {{ services_deploy_dir }}/deploy/wazuh-docker/single-node"
+      - "  docker compose ps"
+      - "  docker logs -f single-node-wazuh.indexer-1"
+      - "  docker logs -f single-node-wazuh.dashboard-1"
+      - "  docker compose restart"

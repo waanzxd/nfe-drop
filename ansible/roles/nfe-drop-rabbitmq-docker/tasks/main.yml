@@ -1,0 +1,36 @@
+---
+# Role: nfe-drop-rabbitmq-docker
+# Sobe RabbitMQ (com UI de management) via Docker Compose,
+# usando um docker-compose.rabbitmq.yml gerenciado pelo Ansible.
+
+- name: Garante que diretório deploy existe
+  file:
+    path: "{{ services_deploy_dir }}/deploy"
+    state: directory
+    mode: "0755"
+
+- name: Instala docker-compose.rabbitmq.yml gerenciado pelo Ansible
+  copy:
+    dest: "{{ services_deploy_dir }}/deploy/docker-compose.rabbitmq.yml"
+    owner: "{{ login_user }}"
+    group: "{{ login_user }}"
+    mode: "0644"
+    content: |
+      version: "3.8"
+
+      services:
+        rabbitmq:
+          image: rabbitmq:3-management
+          container_name: nfe-drop-rabbitmq
+          restart: unless-stopped
+          ports:
+            - "5672:5672"
+            - "15672:15672"
+          environment:
+            RABBITMQ_DEFAULT_USER: "guest"
+            RABBITMQ_DEFAULT_PASS: "guest"
+
+- name: Sobe RabbitMQ via docker compose
+  command: docker compose -f docker-compose.rabbitmq.yml up -d
+  args:
+    chdir: "{{ services_deploy_dir }}/deploy"

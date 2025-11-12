@@ -1,0 +1,19 @@
+---
+# Role: nfe-drop-observability
+# Sobe Prometheus + Grafana via docker compose
+
+- name: Verifica se docker-compose.observability.yml existe
+  stat:
+    path: "{{ app_source_dir }}/deploy/docker-compose.observability.yml"
+  register: observability_compose
+
+- name: Falha se docker-compose.observability.yml não existir
+  fail:
+    msg: "Arquivo {{ app_source_dir }}/deploy/docker-compose.observability.yml não encontrado. Crie o compose de observability primeiro."
+  when: not observability_compose.stat.exists
+
+- name: Sobe Prometheus + Grafana via docker compose
+  command: >
+    docker compose -f docker-compose.observability.yml up -d
+  args:
+    chdir: "{{ app_source_dir }}/deploy"
