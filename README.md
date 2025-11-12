@@ -16,6 +16,9 @@
 [![Wazuh](https://img.shields.io/badge/Wazuh-SIEM-025E8C?logo=wazuh&logoColor=white)]()
 [![Git](https://img.shields.io/badge/Git-Controle_de_Versão-F05032?logo=git&logoColor=white)]()
 [![GitHub](https://img.shields.io/badge/GitHub-Repo-181717?logo=github&logoColor=white)]()
+![MongoDB](https://img.shields.io/badge/MongoDB-6.x-47A248?logo=mongodb&logoColor=white)
+![Elasticsearch](https://img.shields.io/badge/Elasticsearch-8.x-005571?logo=elasticsearch&logoColor=white)
+![OpenSearch](https://img.shields.io/badge/OpenSearch-2.x-005EB8?logo=opensearch&logoColor=white)
 
 
 <img src="nfe-drop.png" alt="Golang" width="200" />
